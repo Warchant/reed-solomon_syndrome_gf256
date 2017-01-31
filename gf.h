@@ -3,7 +3,7 @@
 #include "util.h"
 
 #define GFsize 256
-#define m 8           // степень RS-полинома (согласно Стандарта ECMA-130 - восемь)
+#define m 8 // степень RS-полинома (согласно Стандарта ECMA-130 - восемь)
 
 // несократимый порождающий полином
 // согласно Стандарту ECMA-130: P(x) = x8 + x4 + x3 + x2 + 1
@@ -98,11 +98,11 @@ int gf_sum(int a, int b)
 }
 
 // returns reminder after polynomial division of a/b
-int *gf_polydiv(int *a, int alen, int *b, int blen)
+int *gf_polydiv(int *a, int alen, int *b, int blen, int *new_len)
 {
     if (alen < blen)
         return a;
-    
+
     // backup a
     int *a_copy = vector_copy(a, alen);
 
@@ -110,12 +110,12 @@ int *gf_polydiv(int *a, int alen, int *b, int blen)
 
     // g = [0,0...0, b[0], b[1], b[n]]
     // alen-blen zeros at the start
-    int *g = (int*) malloc(sizeof(int) * alen);
-    for(int i=0; i < alen; i++){
-        g[i] = (i < alen-blen) ? 0 : b[i - (alen-blen)];
-    }
+    int *g = (int *)calloc(alen, sizeof(int));
+    for (int i = 0; i < alen; i++)
+        g[i] = (i < alen - blen) ? 0 : b[i - (alen - blen)];
 
-    for(int i=0; i<alen; i++){
+    for (int i = 0; i < alen; i++)
+    {
         g[i] = gf_mul(g[i], q);
         a_copy[i] = gf_sum(a_copy[i], g[i]);
     }
@@ -126,48 +126,47 @@ int *gf_polydiv(int *a, int alen, int *b, int blen)
     free(a_copy);
     free(g);
 
-    return gf_polydiv(a_new, a_new_len, b, blen);
+    if (new_len != NULL)
+        *new_len = a_new_len;
+
+    return gf_polydiv(a_new, a_new_len, b, blen, new_len);
 }
 
-
 // finds determinant of 2x2 matrix in GF(256)
-int gf_matr_det(int** M, int rows, int cols){
-    if(rows != cols && rows != 2){
+int gf_matr_det(int **M, int rows, int cols)
+{
+    if (rows != cols && rows != 2)
         fatal("gf_det", "only 2x2 matrix\n");
-    }
 
     int first = gf_mul(M[0][0], M[1][1]);
     int second = gf_mul(M[1][0], M[0][1]);
     return gf_sum(first, second);
 }
 
-
 // multiply matrices AxB in GF(256), any dimensions
-int ** gf_matr_mul(int **a, int a_rows, int a_cols, 
-                   int **b, int b_rows, int b_cols){
-    if(a_cols != b_rows){
+int **gf_matr_mul(int **a, int a_rows, int a_cols,
+                  int **b, int b_rows, int b_cols)
+{
+    if (a_cols != b_rows)
         fatal("gf_matr_mul", " a_cols != b_rows\n");
-    }
 
     int **c = matrix_new(a_rows, b_cols);
-    for(int i=0; i<a_rows; i++){
-        for(int j=0; j<b_cols; j++){
+    for (int i = 0; i < a_rows; i++)
+        for (int j = 0; j < b_cols; j++)
+        {
             c[i][j] = 0;
-            for(int _k=0; _k<b_rows; _k++){
+            for (int _k = 0; _k < b_rows; _k++)
                 c[i][j] = gf_sum(c[i][j], gf_mul(a[i][_k], b[_k][j]));
-            }
         }
-    }
 
     return c;
 }
 
-
 // find inverse 2x2 matrix in GF(256)
-int ** gf_matr_inv(int **a, int a_rows, int a_cols){
-    if(a_rows != a_cols && a_rows != 2){
+int **gf_matr_inv(int **a, int a_rows, int a_cols)
+{
+    if (a_rows != a_cols && a_rows != 2)
         fatal("gf_matr_inv", "i can find Ainv only for 2x2 matrices\n");
-    }
 
     int det = gf_matr_det(a, a_rows, a_cols);
 
@@ -176,14 +175,11 @@ int ** gf_matr_inv(int **a, int a_rows, int a_cols){
 
     swap(&a0[0][0], &a0[1][1]);
 
-    for(int i=0; i<a_rows; i++){
-        for(int j=0; j<a_cols; j++){
+    for (int i = 0; i < a_rows; i++)
+        for (int j = 0; j < a_cols; j++)
             a0inv[i][j] = gf_div(a0[i][j], det);
-        }
-    }
 
     matrix_free(a0, a_rows, a_cols);
 
     return a0inv;
 }
-

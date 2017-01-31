@@ -17,9 +17,11 @@ int main()
         int a[] = {1, 2, 3, 4, 5, 9};
         int b[] = {6, 7, 8, 9, 10};
         int c[] = {126, 21, 32, 203};
-        int *d = gf_polydiv(a, LEN(a), b, LEN(b));
+        int len = 0;
+        int *d = gf_polydiv(a, LEN(a), b, LEN(b), &len);
         REQUIRE(AR_EQ(c, d, LEN(c)));
-        free(d);
+        REQUIRE(LEN(c) == len);
+        vector_free(d);
     }
 
     { // gf_matr_det test
@@ -35,21 +37,13 @@ int main()
     { // gf_matr_mul
         int **e = matrix_new(2, 3);
         for (int i = 0; i < 2; i++)
-        {
             for (int j = 0; j < 3; j++)
-            {
                 e[i][j] = i * j;
-            }
-        }
 
         int **d = matrix_new(3, 3);
         for (int i = 0; i < 3; i++)
-        {
             for (int j = 0; j < 3; j++)
-            {
                 d[i][j] = i + j;
-            }
-        }
 
         int **c = gf_matr_mul(e, 2, 3, d, 3, 3);
         int **z = matrix_new(2, 3);
@@ -92,7 +86,5 @@ int main()
         matrix_free(c, 2, 2);
     }
 
-    vector_print(alpha_of, GFsize);
-    vector_print(index_of, GFsize);
-    return total;
+    TEST_EXIT;
 }
