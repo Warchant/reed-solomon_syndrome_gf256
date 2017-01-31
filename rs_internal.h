@@ -22,7 +22,9 @@ uint32_t *generating_polynomial(uint32_t t, uint32_t *len)
 
             // TODO: this can be more effective
             // g = [[0] + g]
-            uint32_t *g0 = stack(vector_new(1), 1, g, glen, &glen);
+            uint32_t *z = vector_new(1);
+            uint32_t *g0 = stack(z, 1, g, glen, &glen);
+            vector_free(z);
             vector_free(g);
             g = g0;
             if (len != NULL)

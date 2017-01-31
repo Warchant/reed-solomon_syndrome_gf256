@@ -68,5 +68,24 @@ uint32_t main()
         vector_free(actual);
     }
 
+    { // generator test
+        uint32_t t = 2;
+        uint32_t size = 0;
+        uint32_t *q = generating_polynomial(t, &size);
+        uint32_t *w = generating_polynomial(t, NULL);
+        uint32_t *e = generating_polynomial(t, NULL);
+        uint32_t *r = generating_polynomial(t, NULL);
+
+        REQUIRE(AR_EQ(q,w,size));
+        REQUIRE(AR_EQ(w,e,size));
+        REQUIRE(AR_EQ(e,r,size));
+        REQUIRE(AR_EQ(r,q,size));
+
+        vector_free(q);
+        vector_free(w);
+        vector_free(e);
+        vector_free(r);
+    }
+
     TEST_EXIT;
 }

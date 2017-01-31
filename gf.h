@@ -99,13 +99,10 @@ uint32_t gf_sum(uint32_t a, uint32_t b)
 }
 
 // returns reminder after polynomial division of a/b
-uint32_t *gf_polydiv(uint32_t *a, uint32_t alen, uint32_t *b, uint32_t blen, uint32_t *new_len)
+uint32_t *gf_polydiv_recursive(uint32_t *a, uint32_t alen, uint32_t *b, uint32_t blen, uint32_t *new_len)
 {
     if (alen < blen)
         return a;
-
-    // backup a
-    uint32_t *a_copy = vector_copy(a, alen);
 
     uint32_t q = gf_div(a[alen - 1], b[blen - 1]);
 
@@ -118,19 +115,24 @@ uint32_t *gf_polydiv(uint32_t *a, uint32_t alen, uint32_t *b, uint32_t blen, uin
     for (uint32_t i = 0; i < alen; i++)
     {
         g[i] = gf_mul(g[i], q);
-        a_copy[i] = gf_sum(a_copy[i], g[i]);
+        a[i] = gf_sum(a[i], g[i]);
     }
 
     uint32_t a_new_len = alen - 1;
-    uint32_t *a_new = submatrix(a_copy, 0, a_new_len);
+    uint32_t *a_new = submatrix(a, 0, a_new_len);
 
-    vector_free(a_copy);
+    vector_free(a);
     vector_free(g);
 
     if (new_len != NULL)
         *new_len = a_new_len;
 
-    return gf_polydiv(a_new, a_new_len, b, blen, new_len);
+    return gf_polydiv_recursive(a_new, a_new_len, b, blen, new_len);
+}
+
+uint32_t *gf_polydiv(uint32_t *a, uint32_t alen, uint32_t *b, uint32_t blen, uint32_t *new_len){
+    uint32_t *v = vector_copy(a, alen);
+    return gf_polydiv_recursive(v, alen, b, blen, new_len);
 }
 
 // finds determinant of 2x2 matrix in GF(256)
