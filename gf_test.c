@@ -5,13 +5,14 @@
 uint32_t main()
 {
     generate_gf();
-
+ 
     REQUIRE(gf_mul(116, 180) == 96);
     REQUIRE(gf_div(180, 116) == 116);
     REQUIRE(gf_sum(1, 4) == 5);
     REQUIRE(alpha_of[7] == 128);
     REQUIRE(gf_mul(alpha_of[250], alpha_of[10]) == 32);
     REQUIRE(gf_div(116, 192) == 251);
+
 
     { // gf_polydiv test
         uint32_t a[] = {1, 2, 3, 4, 5, 9};
@@ -110,6 +111,6 @@ uint32_t main()
         matrix_free(a, 2, 2);
         vector_free(actual);
     }
-
+    
     TEST_EXIT;
 }

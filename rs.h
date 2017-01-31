@@ -17,21 +17,17 @@ uint8_t *encode_message(uint8_t *msg, uint32_t msg_len, uint32_t t, uint32_t *ou
 
     uint32_t m_len = 0;
     uint32_t *M = shift_msg_to_vec(msg, msg_len, t, &m_len);
-    vector_print(M, m_len);
 
     uint32_t g_len = 0;
     uint32_t *G = generating_polynomial(t, &g_len);
-    vector_print(G, g_len);
 
     uint32_t b_len = 0;
     uint32_t *B = calculate_check_symbols(M, m_len, G, g_len, t, &b_len);
-    vector_print(B, b_len);
 
     vector_free(G);
 
     uint32_t c_len = 0;
     uint32_t *C = vector_sum(B, b_len, M, m_len, &c_len);
-    vector_print(C, c_len);
 
     vector_free(M);
     vector_free(B);

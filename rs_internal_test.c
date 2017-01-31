@@ -55,6 +55,7 @@ uint32_t main()
         REQUIRE(AR_EQ(v, a, LEN(v)));
         vector_free(G);
         vector_free(a);
+        vector_free(M);
     }
 
     { // calculate syndrome test

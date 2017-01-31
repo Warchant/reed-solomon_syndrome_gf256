@@ -27,7 +27,7 @@ uint32_t **matrix_new(uint32_t rows, uint32_t cols)
 // free allocated matrix
 void matrix_free(uint32_t **a, uint32_t rows, uint32_t cols)
 {
-    for (uint32_t i = 0; i < rows; i++)
+    for (uint32_t i = 0; i < rows + 1; i++)
         free(a[i]);
     free(a);
 }

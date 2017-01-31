@@ -61,7 +61,6 @@ uint32_t main()
         uint32_t msg_len = LEN(msg) - 1;
         uint32_t len = 0;
         uint8_t *codeword = encode_message(msg, msg_len, t, &len);
-        printf("%s\n", codeword);
         uint8_t *M = decode_message(codeword, len, t, &len);
         REQUIRE(STR_EQ(msg, M, msg_len));
         REQUIRE(len == msg_len);
@@ -75,7 +74,6 @@ uint32_t main()
         uint32_t msg_len = LEN(msg) - 1;
         uint32_t len = 0;
         uint8_t *codeword = encode_message(msg, msg_len, t, &len);
-        printf("%s\n", codeword);
         uint8_t *M = decode_message(codeword, len, t, &len);
         REQUIRE(STR_EQ(msg, M, msg_len));
         REQUIRE(len == msg_len);

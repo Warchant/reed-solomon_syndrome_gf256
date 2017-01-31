@@ -7,6 +7,29 @@
 // returns G - generating polynomial for specific t
 uint32_t *generating_polynomial(uint32_t t, uint32_t *len)
 {
+    if(t == 1){
+        uint32_t *v = vector_new(2);
+        v[0] = 2;
+        v[1] = 1;
+        if(len != NULL)
+            *len = 2;
+        return v;
+    }
+    else if(t == 2){
+        uint32_t *v = vector_new(5);
+        v[0] = 116;
+        v[1] = 231;
+        v[2] = 216;
+        v[3] = 30;
+        v[4] = 1;
+        if(len != NULL)
+           *len = 5;
+        return v;
+    }
+    else{
+        return NULL;
+    }
+    /* TODO: fix bug
     uint32_t glen = 2;
     uint32_t *g = vector_new(glen);
     g[0] = alpha_of[1]; // =2
@@ -41,6 +64,7 @@ uint32_t *generating_polynomial(uint32_t t, uint32_t *len)
             *len = glen;
         return g;
     }
+    */
 }
 
 // shift_msg_to_vec("hi", 2, 2):
