@@ -2,7 +2,7 @@
 #include "test.h"
 #include "util.h"
 
-int main()
+uint32_t main()
 {
     generate_gf();
 
@@ -14,18 +14,29 @@ int main()
     REQUIRE(gf_div(116, 192) == 251);
 
     { // gf_polydiv test
-        int a[] = {1, 2, 3, 4, 5, 9};
-        int b[] = {6, 7, 8, 9, 10};
-        int c[] = {126, 21, 32, 203};
-        int len = 0;
-        int *d = gf_polydiv(a, LEN(a), b, LEN(b), &len);
+        uint32_t a[] = {1, 2, 3, 4, 5, 9};
+        uint32_t b[] = {6, 7, 8, 9, 10};
+        uint32_t c[] = {126, 21, 32, 203};
+        uint32_t len = 0;
+        uint32_t *d = gf_polydiv(a, LEN(a), b, LEN(b), &len);
+        REQUIRE(AR_EQ(c, d, LEN(c)));
+        REQUIRE(LEN(c) == len);
+        vector_free(d);
+    }
+
+    { // gf_polydiv test
+        uint32_t a[] = {0,0,0,0,104,101,108,108,111};
+        uint32_t b[] = {116,231,216,30,1};
+        uint32_t c[] = {228,212,208,62};
+        uint32_t len = 0;
+        uint32_t *d = gf_polydiv(a, LEN(a), b, LEN(b), &len);
         REQUIRE(AR_EQ(c, d, LEN(c)));
         REQUIRE(LEN(c) == len);
         vector_free(d);
     }
 
     { // gf_matr_det test
-        int **e = matrix_new(2, 2);
+        uint32_t **e = matrix_new(2, 2);
         e[0][0] = 100;
         e[1][1] = 91;
         e[0][1] = 50;
@@ -35,18 +46,18 @@ int main()
     }
 
     { // gf_matr_mul
-        int **e = matrix_new(2, 3);
-        for (int i = 0; i < 2; i++)
-            for (int j = 0; j < 3; j++)
+        uint32_t **e = matrix_new(2, 3);
+        for (uint32_t i = 0; i < 2; i++)
+            for (uint32_t j = 0; j < 3; j++)
                 e[i][j] = i * j;
 
-        int **d = matrix_new(3, 3);
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 3; j++)
+        uint32_t **d = matrix_new(3, 3);
+        for (uint32_t i = 0; i < 3; i++)
+            for (uint32_t j = 0; j < 3; j++)
                 d[i][j] = i + j;
 
-        int **c = gf_matr_mul(e, 2, 3, d, 3, 3);
-        int **z = matrix_new(2, 3);
+        uint32_t **c = gf_matr_mul(e, 2, 3, d, 3, 3);
+        uint32_t **z = matrix_new(2, 3);
 
         z[0][0] = 0;
         z[0][1] = 0;
@@ -65,19 +76,19 @@ int main()
     }
 
     { // gf_matr_inv
-        int **a = matrix_new(2, 2);
+        uint32_t **a = matrix_new(2, 2);
         a[0][0] = 1;
         a[0][1] = 150;
         a[1][0] = 13;
         a[1][1] = 93;
 
-        int **b = matrix_new(2, 2);
+        uint32_t **b = matrix_new(2, 2);
         b[0][0] = 171;
         b[0][1] = 35;
         b[1][0] = 72;
         b[1][1] = 236;
 
-        int **c = gf_matr_inv(a, 2, 2);
+        uint32_t **c = gf_matr_inv(a, 2, 2);
 
         REQUIRE(MX_EQ(c, 2, 2, b, 2, 2));
 
@@ -87,14 +98,14 @@ int main()
     }
 
     { // gf_matr_mul_vector
-        int **a = matrix_new(2, 2);
+        uint32_t **a = matrix_new(2, 2);
         a[0][0] = 1;
         a[0][1] = 2;
         a[1][0] = 3;
         a[1][1] = 4;
-        int v[] = {5, 6};
-        int expected[] = {9, 23};
-        int *actual = gf_matr_mul_vector(a, 2, 2, v, 2);
+        uint32_t v[] = {5, 6};
+        uint32_t expected[] = {9, 23};
+        uint32_t *actual = gf_matr_mul_vector(a, 2, 2, v, 2);
         REQUIRE(AR_EQ(expected, actual, LEN(expected)));
         matrix_free(a, 2, 2);
         vector_free(actual);

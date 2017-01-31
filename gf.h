@@ -1,17 +1,18 @@
 #pragma once
 
 #include "util.h"
+#include "types.h"
 
 #define GFsize 256
 #define m 8 // степень RS-полинома (согласно Стандарта ECMA-130 - восемь)
 
 // несократимый порождающий полином
 // согласно Стандарту ECMA-130: P(x) = x8 + x4 + x3 + x2 + 1
-int p[m + 1] = {1, 0, 1, 1, 1, 0, 0, 0, 1};
+uint32_t p[m + 1] = {1, 0, 1, 1, 1, 0, 0, 0, 1};
 
 // GF[i] = alpha_of[i]
-int alpha_of[GFsize]; // таблица степеней примитивного члена
-int index_of[GFsize]; // индексная таблица для быстрого умножения
+uint32_t alpha_of[GFsize]; // таблица степеней примитивного члена
+uint32_t index_of[GFsize]; // индексная таблица для быстрого умножения
 
 //----------------------------------------------------------------------------
 // генерируем look-up таблицу для быстрого умножения для GF(2 ^ m) на основе
@@ -29,7 +30,7 @@ int index_of[GFsize]; // индексная таблица для быстрог
 
 void generate_gf()
 {
-    int i, mask;
+    uint32_t i, mask;
 
     mask = 1;
     alpha_of[m] = 0;
@@ -60,9 +61,9 @@ void generate_gf()
 
 // функция возвращает результат умножения
 // двух полиномов a на b в полях Галуа
-int gf_mul(int a, int b)
+uint32_t gf_mul(uint32_t a, uint32_t b)
 {
-    int sum;
+    uint32_t sum;
     if (a == 0 || b == 0)
         return 0;
     if (a < 0 || b < 0)
@@ -78,9 +79,9 @@ int gf_mul(int a, int b)
 // двух полиномов a на b в полях Галуа
 // при попытке деления на ноль функция
 // возвращает -1
-int gf_div(int a, int b)
+uint32_t gf_div(uint32_t a, uint32_t b)
 {
-    int diff;
+    int32_t diff;
     if (a == 0)
         return 0; // немного оптимизации не повредит
     if (b == 0)
@@ -92,39 +93,39 @@ int gf_div(int a, int b)
                             // ...форму и возвращаем результат
 }
 
-int gf_sum(int a, int b)
+uint32_t gf_sum(uint32_t a, uint32_t b)
 {
     return a ^ b;
 }
 
 // returns reminder after polynomial division of a/b
-int *gf_polydiv(int *a, int alen, int *b, int blen, int *new_len)
+uint32_t *gf_polydiv(uint32_t *a, uint32_t alen, uint32_t *b, uint32_t blen, uint32_t *new_len)
 {
     if (alen < blen)
         return a;
 
     // backup a
-    int *a_copy = vector_copy(a, alen);
+    uint32_t *a_copy = vector_copy(a, alen);
 
-    int q = gf_div(a[alen - 1], b[blen - 1]);
+    uint32_t q = gf_div(a[alen - 1], b[blen - 1]);
 
     // g = [0,0...0, b[0], b[1], b[n]]
     // alen-blen zeros at the start
-    int *g = vector_new(alen);
-    for (int i = 0; i < alen; i++)
+    uint32_t *g = vector_new(alen);
+    for (uint32_t i = 0; i < alen; i++)
         g[i] = (i < alen - blen) ? 0 : b[i - (alen - blen)];
 
-    for (int i = 0; i < alen; i++)
+    for (uint32_t i = 0; i < alen; i++)
     {
         g[i] = gf_mul(g[i], q);
         a_copy[i] = gf_sum(a_copy[i], g[i]);
     }
 
-    int a_new_len = alen - 1;
-    int *a_new = submatrix(a_copy, 0, a_new_len);
+    uint32_t a_new_len = alen - 1;
+    uint32_t *a_new = submatrix(a_copy, 0, a_new_len);
 
-    free(a_copy);
-    free(g);
+    vector_free(a_copy);
+    vector_free(g);
 
     if (new_len != NULL)
         *new_len = a_new_len;
@@ -133,45 +134,45 @@ int *gf_polydiv(int *a, int alen, int *b, int blen, int *new_len)
 }
 
 // finds determinant of 2x2 matrix in GF(256)
-int gf_matr_det(int **M, int rows, int cols)
+uint32_t gf_matr_det(uint32_t **M, uint32_t rows, uint32_t cols)
 {
     if (rows != cols && rows != 2)
         fatal("gf_det", "only 2x2 matrix\n");
 
-    int first = gf_mul(M[0][0], M[1][1]);
-    int second = gf_mul(M[1][0], M[0][1]);
+    uint32_t first = gf_mul(M[0][0], M[1][1]);
+    uint32_t second = gf_mul(M[1][0], M[0][1]);
     return gf_sum(first, second);
 }
 
 // multiply matrices AxB in GF(256), any dimensions
-int **gf_matr_mul(int **a, int a_rows, int a_cols,
-                  int **b, int b_rows, int b_cols)
+uint32_t **gf_matr_mul(uint32_t **a, uint32_t a_rows, uint32_t a_cols,
+                  uint32_t **b, uint32_t b_rows, uint32_t b_cols)
 {
     if (a_cols != b_rows)
         fatal("gf_matr_mul", " a_cols != b_rows\n");
 
-    int **c = matrix_new(a_rows, b_cols);
-    for (int i = 0; i < a_rows; i++)
-        for (int j = 0; j < b_cols; j++)
+    uint32_t **c = matrix_new(a_rows, b_cols);
+    for (uint32_t i = 0; i < a_rows; i++)
+        for (uint32_t j = 0; j < b_cols; j++)
         {
             c[i][j] = 0;
-            for (int _k = 0; _k < b_rows; _k++)
+            for (uint32_t _k = 0; _k < b_rows; _k++)
                 c[i][j] = gf_sum(c[i][j], gf_mul(a[i][_k], b[_k][j]));
         }
 
     return c;
 }
 
-int *gf_matr_mul_vector(int **a, int rows, int cols, int* v, int len){
+uint32_t *gf_matr_mul_vector(uint32_t **a, uint32_t rows, uint32_t cols, uint32_t* v, uint32_t len){
     if(rows != len)
         fatal("gf_matr_mul_vector", "rows != vector rows\n");
 
-    int *c = vector_new(rows);
-    for (int i = 0; i < rows; i++)
-        for (int j = 0; j < 1; j++)
+    uint32_t *c = vector_new(rows);
+    for (uint32_t i = 0; i < rows; i++)
+        for (uint32_t j = 0; j < 1; j++)
         {
             c[i] = 0;
-            for (int _k = 0; _k < len; _k++)
+            for (uint32_t _k = 0; _k < len; _k++)
                 c[i] = gf_sum(c[i], gf_mul(a[i][_k], v[_k]));
         }
 
@@ -179,20 +180,20 @@ int *gf_matr_mul_vector(int **a, int rows, int cols, int* v, int len){
 }
 
 // find inverse 2x2 matrix in GF(256)
-int **gf_matr_inv(int **a, int a_rows, int a_cols)
+uint32_t **gf_matr_inv(uint32_t **a, uint32_t a_rows, uint32_t a_cols)
 {
     if (a_rows != a_cols && a_rows != 2)
         fatal("gf_matr_inv", "Ainv only for 2x2 matrices\n");
 
-    int det = gf_matr_det(a, a_rows, a_cols);
+    uint32_t det = gf_matr_det(a, a_rows, a_cols);
 
-    int **a0 = matrix_copy(a, a_rows, a_cols);
-    int **a0inv = matrix_new(a_rows, a_cols);
+    uint32_t **a0 = matrix_copy(a, a_rows, a_cols);
+    uint32_t **a0inv = matrix_new(a_rows, a_cols);
 
     swap(&a0[0][0], &a0[1][1]);
 
-    for (int i = 0; i < a_rows; i++)
-        for (int j = 0; j < a_cols; j++)
+    for (uint32_t i = 0; i < a_rows; i++)
+        for (uint32_t j = 0; j < a_cols; j++)
             a0inv[i][j] = gf_div(a0[i][j], det);
 
     matrix_free(a0, a_rows, a_cols);
