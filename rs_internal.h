@@ -77,3 +77,27 @@ int *calculate_check_symbols(int *M, int m_len, int *G, int g_len, int t, int *n
 
     return v;
 }
+
+int *calculate_syndrome(int *c1, int c_len, int t, int *new_len)
+{
+    int len = 2 * t;
+    if (new_len != NULL)
+        *new_len = len;
+
+    int *S = vector_new(len);
+    for (int i = 1; i <= len; i++)
+    {
+        S[i - 1] = 0;
+        for (int j = 0; j < c_len; j++)
+            S[i - 1] = gf_sum(S[i - 1], gf_mul(c1[j], alpha_of[i * j % GFsize]));
+    }
+
+    return S;
+}
+
+char* extract_message(int* c1, int c_len, int t, int* output_len){
+    char *M = vector_to_str(c1, c_len);
+    char *ret = substring(M, 2 * t, c_len - 1, output_len);
+    free(M);
+    return ret;
+}

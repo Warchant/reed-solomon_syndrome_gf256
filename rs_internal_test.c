@@ -47,7 +47,7 @@ int main()
         int t = 2;
         int v[] = {69, 211, 228, 205, 0, 0};
         int m_len = 0;
-        int* M = shift_msg_to_vec("hi", 2, t, &m_len);
+        int *M = shift_msg_to_vec("hi", 2, t, &m_len);
         int g_len = 0;
         int *G = generating_polynomial(t, &g_len);
         int a_len = 0;
@@ -55,6 +55,17 @@ int main()
         REQUIRE(AR_EQ(v, a, LEN(v)));
         vector_free(G);
         vector_free(a);
+    }
+
+    { // calculate syndrome test
+        int t = 2;
+        int expected[] = {130, 153, 245, 88};
+        int c1[] = {192, 211, 44, 205, 104, 105};
+        int actual_len = 0;
+        int *actual = calculate_syndrome(c1, LEN(c1), t, &actual_len);
+        REQUIRE(AR_EQ(actual, expected, LEN(expected)));
+        REQUIRE(actual_len == LEN(expected));
+        vector_free(actual);
     }
 
     TEST_EXIT;

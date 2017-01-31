@@ -46,7 +46,7 @@ void generate_gf()
     index_of[alpha_of[m]] = m;
     mask >>= 1;
 
-    for (i = m + 1; i < pow2(m); i++)
+    for (i = m + 1; i < pow2(m) - 1; i++)
     {
         if (alpha_of[i - 1] >= mask)
             alpha_of[i] = alpha_of[m] ^ ((alpha_of[i - 1] ^ mask) << 1);
@@ -110,7 +110,7 @@ int *gf_polydiv(int *a, int alen, int *b, int blen, int *new_len)
 
     // g = [0,0...0, b[0], b[1], b[n]]
     // alen-blen zeros at the start
-    int *g = (int *)calloc(alen, sizeof(int));
+    int *g = vector_new(alen);
     for (int i = 0; i < alen; i++)
         g[i] = (i < alen - blen) ? 0 : b[i - (alen - blen)];
 
@@ -162,11 +162,27 @@ int **gf_matr_mul(int **a, int a_rows, int a_cols,
     return c;
 }
 
+int *gf_matr_mul_vector(int **a, int rows, int cols, int* v, int len){
+    if(rows != len)
+        fatal("gf_matr_mul_vector", "rows != vector rows\n");
+
+    int *c = vector_new(rows);
+    for (int i = 0; i < rows; i++)
+        for (int j = 0; j < 1; j++)
+        {
+            c[i] = 0;
+            for (int _k = 0; _k < len; _k++)
+                c[i] = gf_sum(c[i], gf_mul(a[i][_k], v[_k]));
+        }
+
+    return c;
+}
+
 // find inverse 2x2 matrix in GF(256)
 int **gf_matr_inv(int **a, int a_rows, int a_cols)
 {
     if (a_rows != a_cols && a_rows != 2)
-        fatal("gf_matr_inv", "i can find Ainv only for 2x2 matrices\n");
+        fatal("gf_matr_inv", "Ainv only for 2x2 matrices\n");
 
     int det = gf_matr_det(a, a_rows, a_cols);
 
@@ -183,3 +199,4 @@ int **gf_matr_inv(int **a, int a_rows, int a_cols)
 
     return a0inv;
 }
+

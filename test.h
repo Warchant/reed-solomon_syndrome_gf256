@@ -51,12 +51,8 @@ char MX_EQ(int **a, int a_rows, int a_cols,
         return 0;
 
     for (int i = 0; i < a_rows; i++)
-    {
         for (int j = 0; j < a_cols; j++)
-        {
             if (a[i][j] != b[i][j])
                 return 0;
-        }
-    }
     return 1;
 }

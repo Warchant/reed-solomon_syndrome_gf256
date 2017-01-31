@@ -42,11 +42,31 @@ int main()
     }
 
     { // vector to str test
-        char* expected = "hello world";
-        int v[] = {104,101,108,108,111,32,119,111,114,108,100};
-        char* actual = vector_to_str(v, LEN(v));
+        char *expected = "hello world";
+        int v[] = {104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100};
+        char *actual = vector_to_str(v, LEN(v));
         REQUIRE(STR_EQ(expected, actual, LEN(v)));
         free(actual);
+    }
+
+    { // sum test
+        int a[] = {1, 2, 4, 8, 16, 32};
+        REQUIRE(sum(a, LEN(a)) == 63);
+    }
+
+    { // substring test
+        char s[] = "hello world";
+        char expected[] = "llo ";
+        int len = 0;
+        char *res = substring(s, 2, 5, &len);
+        REQUIRE(STR_EQ(expected, res, LEN(expected)));
+        REQUIRE(len == 4);
+        free(res);
+    }
+
+    { // strlength test
+        char s[] = "hello world!";
+        REQUIRE(strlength(s) == LEN(s) - 1);
     }
 
     TEST_EXIT;

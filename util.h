@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
 #define LEN(x) (sizeof(x) / sizeof(x[0]))
 
@@ -18,12 +17,17 @@ void vector_free(int *);
 int *stack(int *, int, int *, int, int *);
 int *submatrix(int *, int, int);
 int pow2(int);
+int *str_to_vector(char *s, int s_len);
+char *vector_to_str(int *a, int a_len);
+int *vector_sum(int *a, int a_len, int *b, int b_len, int *new_len);
+int sum(int *v, int v_len);
+char *substring(char *s, int start, int end, int *new_size);
+int strlength(char *s);
 
 void vector_print(int *a, int size)
 {
     for (int i = 0; i < size; i++)
         printf("%d ", a[i]);
-
     printf("\n");
 }
 
@@ -52,7 +56,6 @@ int **matrix_copy(int **a, int rows, int cols)
     for (int i = 0; i < rows; i++)
         for (int j = 0; j < cols; j++)
             b[i][j] = a[i][j];
-
     return b;
 }
 
@@ -77,7 +80,8 @@ int *vector_new(int len)
 int *vector_copy(int *a, int len)
 {
     int *b = vector_new(len);
-    memcpy(b, a, len * sizeof(int));
+    for (int i = 0; i < len; i++)
+        b[i] = a[i];
     return b;
 }
 
@@ -100,7 +104,6 @@ int *stack(int *a, int alen, int *b, int blen, int *out_size)
 
     for (int i = 0; i < size; i++)
         c[i] = i < alen ? a[i] : b[i - alen];
-
     return c;
 }
 
@@ -109,7 +112,6 @@ int *submatrix(int *a, int start, int end)
     int *g = vector_new(end - start);
     for (int i = start; i <= end; i++)
         g[i - start] = a[i];
-
     return g;
 }
 
@@ -127,10 +129,9 @@ int *vector_sum(int *a, int a_len, int *b, int b_len, int *new_len)
 
     if (new_len != NULL)
         *new_len = a_len;
-    
+
     for (int i = 0; i < a_len; i++)
         c[i] = a[i] + b[i];
-
     return c;
 }
 
@@ -139,6 +140,55 @@ char *vector_to_str(int *a, int a_len)
     char *b = (char *)calloc(a_len + 1, sizeof(char));
     for (int i = 0; i < a_len; i++)
         b[i] = a[i];
-
     return b;
+}
+
+int *str_to_vector(char *s, int s_len)
+{
+    int *v = vector_new(s_len);
+    for (int i = 0; i < s_len; i++)
+        v[i] = ((int)s[i] < 0) ? 256 + s[i] : s[i];
+    return v;
+}
+
+int sum(int *v, int v_len)
+{
+    int s = 0;
+    for (int i = 0; i < v_len; i++)
+        s += v[i];
+    return s;
+}
+
+// returns new string = substring[start,end]
+char *substring(char *s, int start, int end, int *new_size)
+{
+    if (end - start <= 0)
+        fatal("substring", "end-start <= 0\n");
+
+    // size of substr + \0
+    int len = end - start + 1;
+    if (new_size != NULL)
+        *new_size = len;
+
+    char *ret = (char *)calloc(len + 1, sizeof(char));
+    for (int i = start; i <= end; i++)
+        ret[i - start] = s[i];
+    return ret;
+}
+
+// same as strlen
+int strlength(char *s)
+{
+    int len = 0;
+    for (int i = 0; s[i]; i++)
+        len++;
+    return len;
+}
+
+int count(int *v, int len, int item){
+    int c = 0;
+    for(int i=0;i<len;i++)
+        if(v[i] == item)
+            c++;
+    return c;
 }

@@ -86,5 +86,19 @@ int main()
         matrix_free(c, 2, 2);
     }
 
+    { // gf_matr_mul_vector
+        int **a = matrix_new(2, 2);
+        a[0][0] = 1;
+        a[0][1] = 2;
+        a[1][0] = 3;
+        a[1][1] = 4;
+        int v[] = {5, 6};
+        int expected[] = {9, 23};
+        int *actual = gf_matr_mul_vector(a, 2, 2, v, 2);
+        REQUIRE(AR_EQ(expected, actual, LEN(expected)));
+        matrix_free(a, 2, 2);
+        vector_free(actual);
+    }
+
     TEST_EXIT;
 }
