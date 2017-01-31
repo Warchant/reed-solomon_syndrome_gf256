@@ -1,11 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 project (rs)
 
-add_executable(rs 
-    main.c
-)
-
-
 include(CTest)
 enable_testing()
 
