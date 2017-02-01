@@ -81,5 +81,17 @@ uint32_t main()
         free(M);
     }
 
+    { // encode
+        uint32_t t = 2;
+        uint8_t msg[] = "hello";
+        uint32_t msg_len = LEN(msg) - 1;
+        uint32_t len = 0;
+        uint8_t codeword[] = {0xe4, 0xd4, 0xd0, 0x3e, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
+        uint8_t *M = decode_message(codeword, LEN(codeword), t, &len);
+        REQUIRE(STR_EQ(msg, M, msg_len));
+        REQUIRE(len == msg_len);
+        free(M);
+    }
+
     TEST_EXIT;
 }
