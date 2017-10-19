@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.6)
-project (rs)
+project (rs C)
 
 include(CTest)
 enable_testing()
